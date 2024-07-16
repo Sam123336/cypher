@@ -1,7 +1,6 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
-
-#define endl '\n'
 
 // Node structure
 struct Node {
@@ -10,19 +9,13 @@ struct Node {
     Node* right;
 
     // Constructor
+    Node(int k) : key(k), left(nullptr), right(nullptr) {}
 };
-
-Node* newNode(int key) {
-    Node* root = new Node;
-    root->key = key;
-    root->left = root->right = nullptr;
-    return root;
-}
 
 // Function to insert a node with a given key into the BST
 Node* insert(Node* root, int key) {
     if (root == nullptr) {
-        return newNode(key);
+        return new Node(key);
     }
 
     if (key < root->key) {
@@ -31,6 +24,14 @@ Node* insert(Node* root, int key) {
         root->right = insert(root->right, key);
     }
 
+    return root;
+}
+
+// Function to insert multiple keys into the BST
+Node* insertMultiple(Node* root, vector<int>& keys) {
+    for (int key : keys) {
+        root = insert(root, key);
+    }
     return root;
 }
 
@@ -103,36 +104,96 @@ Node* deleteNode(Node* root, int key) {
     return root;
 }
 
+// Function to print tree structure
+void printTree(Node* root, int space = 0, int indent = 5) {
+    if (root == nullptr) return;
+
+    space += indent;
+
+    printTree(root->right, space, indent);
+
+    cout << endl;
+    for (int i = indent; i < space; i++)
+        cout << " ";
+
+    cout << "|__" << root->key << endl;
+
+    printTree(root->left, space, indent);
+}
+
+void displayMenu() {
+    cout << "\nMenu:\n";
+    cout << "1. Insert key\n";
+    cout << "2. Insert multiple keys\n";
+    cout << "3. Inorder traversal\n";
+    cout << "4. Preorder traversal\n";
+    cout << "5. Postorder traversal\n";
+    cout << "6. Delete key\n";
+    cout << "7. Print Tree\n";
+    cout << "8. Exit\n";
+    cout << "Enter your choice: ";
+}
+
 int main() {
-    ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-
     Node* root = nullptr;
-    int key;
-    while (cin >> key) {
-        root = insert(root, key);
-    }
+    int choice, key;
+    vector<int> keys;
 
-    // Example to show the tree (in-order traversal)
-    cout << "Inorder: ";
-    inorder(root);
-    cout << endl;
+    do {
+        displayMenu();
+        cin >> choice;
 
-    cout << "Preorder: ";
-    preorder(root);
-    cout << endl;
-
-    cout << "Postorder: ";
-    postorder(root);
-    cout << endl;
-
-    // Example delete operation
-    root = deleteNode(root, key); // Assuming 'key' is the key to be deleted
-
-    cout << "Inorder after deletion: ";
-    inorder(root);
-    cout << endl;
+        switch (choice) {
+            case 1:
+                cout << "Enter key to insert: ";
+                cin >> key;
+                root = insert(root, key);
+                break;
+            case 2:
+                cout << "Enter keys to insert (enter -1 to stop):\n";
+                while (true) {
+                    cin >> key;
+                    if (key == -1) break;
+                    keys.push_back(key);
+                }
+                root = insertMultiple(root, keys);
+                keys.clear(); // Clear the keys vector for next use
+                break;
+            case 3:
+                cout << "Inorder traversal: ";
+                inorder(root);
+                cout << endl;
+                break;
+            case 4:
+                cout << "Preorder traversal: ";
+                preorder(root);
+                cout << endl;
+                break;
+            case 5:
+                cout << "Postorder traversal: ";
+                postorder(root);
+                cout << endl;
+                break;
+            case 6:
+                cout << "Enter key to delete: ";
+                cin >> key;
+                root = deleteNode(root, key);
+                cout << "Inorder after deletion: ";
+                inorder(root);
+                cout << endl;
+                break;
+            case 7:
+                cout << "Tree structure:\n";
+                printTree(root);
+                cout << endl;
+                break;
+            case 8:
+                cout << "Exiting program...\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 8);
 
     return 0;
 }
